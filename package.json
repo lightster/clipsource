@@ -1,0 +1,14 @@
+{
+  "name": "clipsource",
+  "xo": {
+    "space": 2,
+    "globals": [
+      "chrome",
+      "document",
+      "location"
+    ],
+    "rules": {
+      "no-unused-vars": ["error", {"args": "none"}]
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Clipsource",
+  "version": "0.1",
+
+  "description": "Keep track of which sites you copied text from",
+
+  "background": {
+    "page": "background.html",
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "clipboardRead",
+    "storage"
+  ]
+}
