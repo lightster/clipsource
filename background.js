@@ -3,16 +3,43 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return;
   }
 
-  const buffer = document.getElementById('buffer');
-  buffer.value = '';
-  buffer.select();
+  const clipboardPromise = new Promise((resolve, reject) => {
+    const buffer = document.getElementById('buffer');
+    buffer.value = '';
+    buffer.select();
 
-  if (!document.execCommand('paste')) {
-    console.log('Could not retrieve contents from clipboard.');
-    return;
-  }
+    if (!document.execCommand('paste')) {
+      console.log('Could not retrieve contents from clipboard.');
+    }
 
-  request.clipboardData = buffer.value;
+    request.clipboardData = buffer.value;
 
-  console.log(request);
+    resolve();
+  });
+
+  const screenshotPromise = new Promise((resolve, reject) => {
+    chrome.tabs.captureVisibleTab(null, {format: 'png'}, dataUri => {
+      request.screenshot = dataUri;
+
+      resolve();
+    });
+  });
+
+  Promise.all([clipboardPromise, screenshotPromise]).then(() => {
+    chrome.storage.local.get(['recent', 'history'], storage => {
+      if (!storage.recent) {
+        storage.recent = [];
+      }
+      if (!storage.history) {
+        storage.history = [];
+      }
+
+      storage.recent.unshift(request);
+      storage.recent = storage.recent.slice(0, 10);
+
+      storage.history.push(request);
+
+      chrome.storage.local.set(storage);
+    });
+  });
 });
