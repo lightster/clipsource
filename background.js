@@ -6,15 +6,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const clipboardPromise = new Promise((resolve, reject) => {
     const buffer = document.getElementById('buffer');
     buffer.value = '';
+    buffer.addEventListener('paste', event => {
+      setTimeout(() => {
+        request.clipboardData = buffer.value;
+
+        resolve();
+      });
+    });
     buffer.select();
 
     if (!document.execCommand('paste')) {
       console.log('Could not retrieve contents from clipboard.');
     }
-
-    request.clipboardData = buffer.value;
-
-    resolve();
   });
 
   const screenshotPromise = new Promise((resolve, reject) => {

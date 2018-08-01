@@ -3,7 +3,6 @@
   const buffer = doc.createElement('div');
 
   chrome.storage.local.get(['recent'], storage => {
-    console.log(storage.recent);
     for (let clip of storage.recent) {
       const clipDiv = doc.createElement('div');
       clipDiv.setAttribute('class', 'clip');
