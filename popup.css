@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ececec;
+}
+
+#clips {
+  width: 780px;
+}
+
+.clip {
+  background-color: #fafaff;
+  float: left;
+  width: 350px;
+  height: 350px;
+  margin: 10px 0 0 10px;
+  padding: 10px;
+  border: 1px solid #dedede;
+  border-radius: 7px;
+}
+
+.clip-screenshot {
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.clip-details {
+  background-color: inherit;
+  box-sizing: border-box;
+  display: none;
+  margin: 0;
+  padding: 0 5px;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: auto;
+}
+
+.clip:hover .clip-screenshot {
+  display: none;
+}
+
+.clip:hover .clip-details {
+  display: block;
+}
+
+.clip-details h2 {
+  background-color: inherit;
+  font-size: 1rem;
+  position: sticky;
+  top: 0;
+  left: 5px;
+  margin: 0;
+  padding: 10px 0;
+}
+
+.clip-details blockquote {
+  white-space: pre-line;
+  font-size: 1rem;
+  margin: 0;
+  padding: 0;
+}
