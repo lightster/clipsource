@@ -4,6 +4,15 @@
   "version": "0.1",
 
   "description": "Keep track of which sites you copied text from",
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "64": "icon64.png",
+    "128": "icon128.png",
+    "256": "icon256.png",
+    "512": "icon512.png"
+  },
 
   "browser_action": {
     "default_popup": "popup.html"
