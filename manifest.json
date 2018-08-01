@@ -5,6 +5,10 @@
 
   "description": "Keep track of which sites you copied text from",
 
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+
   "background": {
     "page": "background.html",
     "persistent": false
