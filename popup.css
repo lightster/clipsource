@@ -4,19 +4,65 @@ body {
   background-color: #ececec;
 }
 
+#nav {
+  padding: 10px 0 10px 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #222211;
+  color: #ffffee;
+}
+
+a.brand {
+  display: inline-block;
+  background-image: url(icon.svg);
+  background-repeat: no-repeat;
+  background-size: 32px 32px;
+  text-decoration: none;
+  color: #5F71FF;
+  font-size: 1.1rem;
+  font-weight: bold;
+  height: 32px;
+  padding-left: 42px;
+  line-height: 2rem;
+}
+
+#nav ul {
+  list-style-type: none;
+  margin: 5px 20px;
+  padding: 0;
+  float: right;
+  font-size: 1.2rem;
+}
+
+#nav ul a {
+  color: #ffffee;
+}
+
+#nav ul a:hover {
+  color: #5F71FF;
+}
+
 #clips {
-  width: 780px;
+  margin-top: 47px;
+  margin-bottom: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 5px;
+  box-sizing: border-box;
 }
 
 .clip {
   background-color: #fafaff;
-  float: left;
   width: 350px;
   height: 200px;
-  margin: 10px 0 0 10px;
+  margin: 10px 5px 0 5px;
   padding: 10px;
   border: 3px solid #dedede;
   border-radius: 7px;
+  flex: none;
+  overflow: hidden;
 }
 
 .clip:hover {
@@ -39,8 +85,6 @@ body {
   padding: 0 5px;
   height: 100%;
   width: 100%;
-  position: relative;
-  overflow: auto;
 }
 
 .clip:hover .clip-screenshot {
@@ -54,9 +98,6 @@ body {
 .clip-details h2 {
   background-color: inherit;
   font-size: 1rem;
-  position: sticky;
-  top: 0;
-  left: 5px;
   margin: 0;
   padding: 10px 0;
 }
