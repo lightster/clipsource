@@ -12,16 +12,21 @@ body {
   background-color: #fafaff;
   float: left;
   width: 350px;
-  height: 350px;
+  height: 200px;
   margin: 10px 0 0 10px;
   padding: 10px;
-  border: 1px solid #dedede;
+  border: 3px solid #dedede;
   border-radius: 7px;
+}
+
+.clip:hover {
+  border-color: #898989;
 }
 
 .clip-screenshot {
   background-position: center;
   background-size: cover;
+  background-repeat: no-repeat;
   height: 100%;
   width: 100%;
 }
