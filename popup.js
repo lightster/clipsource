@@ -9,7 +9,7 @@
       clipDiv.innerHTML = `
         <div class="clip-screenshot" style="background-image: url(${clip.screenshot});"></div>
         <div class="clip-details">
-          <h2><a href=""></a></h2>
+          <h2><a href="" target="_blank"></a></h2>
           <blockquote></blockquote>
         </div>
       `;
