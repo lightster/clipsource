@@ -51,6 +51,7 @@ a.brand {
   flex-wrap: wrap;
   padding: 5px;
   box-sizing: border-box;
+  min-width: 411px;
 }
 
 .clip {
