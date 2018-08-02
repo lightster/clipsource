@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512px" height="512px" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <title>icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#3767FF" offset="0%"></stop>
+            <stop stop-color="#9C11FF" offset="100%"></stop>
+        </linearGradient>
+        <rect id="path-2" x="0" y="0" width="512" height="512" rx="100"></rect>
+    </defs>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-3" fill="white">
+            <use xlink:href="#path-2"></use>
+        </mask>
+        <use id="Mask" fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+        <text id="&lt;^&gt;" font-family="Impact" font-size="250" font-style="condensed" font-weight="700" letter-spacing="30" fill="#FFFFFF">
+            <tspan x="33.2744141" y="352">&lt;^</tspan>
+            <tspan x="347.424805" y="352">&gt;</tspan>
+        </text>
+    </g>
+</svg>
