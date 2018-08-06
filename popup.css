@@ -59,7 +59,6 @@ a.brand {
   width: 516px;
   height: 290px;
   margin: 10px 5px 0 5px;
-  padding: 10px;
   border: 3px solid #dedede;
   border-radius: 7px;
   flex: none;
@@ -76,6 +75,16 @@ a.brand {
   background-repeat: no-repeat;
   height: 100%;
   width: 100%;
+  position: relative;
+}
+
+.clip-summary {
+  position: absolute;
+  bottom: 0;
+  background-color: rgba(222, 222, 222, .8);
+  width: 100%;
+  padding: 3px 5px;
+  box-sizing: border-box;
 }
 
 .clip-details {
@@ -83,18 +92,18 @@ a.brand {
   box-sizing: border-box;
   display: none;
   margin: 0;
-  padding: 0 5px;
+  padding: 10px 15px;
   height: 100%;
   width: 100%;
 }
 
-.clip:hover .clip-screenshot {
-  display: none;
-}
+/* .clip:hover .clip-screenshot { */
+/*   display: none; */
+/* } */
 
-.clip:hover .clip-details {
-  display: block;
-}
+/* .clip:hover .clip-details { */
+/*   display: block; */
+/* } */
 
 .clip-details h2 {
   background-color: inherit;
