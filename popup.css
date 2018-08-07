@@ -12,6 +12,7 @@ body {
   right: 0;
   background-color: #222211;
   color: #ffffee;
+  z-index: 1;
 }
 
 a.brand {
@@ -79,12 +80,15 @@ a.brand {
 }
 
 .clip-summary {
+  font-size: 1rem;
   position: absolute;
   bottom: 0;
   background-color: rgba(222, 222, 222, .8);
   width: 100%;
   padding: 3px 5px;
   box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .clip-details {

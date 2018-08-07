@@ -17,11 +17,17 @@
         continue;
       }
 
+      let summary = clip.clipboardData;
+      if (summary.length > 60) {
+        summary = summary.substr(0, 25) + ' ... ' + summary.substr(summary.length - 25);
+      }
+
       const clipDiv = doc.createElement('div');
       clipDiv.setAttribute('class', 'clip');
       clipDiv.innerHTML = `
         <div class="clip-screenshot" style="background-image: url(${clip.thumbnail});">
           <div class="clip-summary">
+            ${summary}
           </div>
         </div>
         <div class="clip-details">
