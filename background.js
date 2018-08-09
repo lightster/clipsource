@@ -1,4 +1,4 @@
-(function() {
+(function () {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action !== 'copy') {
       return;
@@ -57,18 +57,18 @@
   };
 
   const createThumbnail = (clip, resolve) => {
-    let canvas = document.createElement('canvas');
-    let ctx = canvas.getContext('2d');
-    let img = new Image();
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
 
     canvas.width = 516;
     canvas.height = 290;
     ctx.imageSmoothingQuality = 'high';
 
-    img.onload = () => {
-      let coords = constrainBox(clip.selectionCoordinates, img.width, img.height);
+    img.addEventListener('load', () => {
+      const coords = constrainBox(clip.selectionCoordinates, img.width, img.height);
 
-      let mapped = {};
+      const mapped = {};
       if (coords.width / coords.height > canvas.width / canvas.height) {
         if (coords.width <= canvas.width) {
           mapped.width = canvas.width;
@@ -88,14 +88,14 @@
       mapped.left = Math.max(
         0,
         Math.min(
-          coords.left - mapped.width / 2 + coords.width / 2,
+          coords.left - (mapped.width / 2) + (coords.width / 2),
           clip.window.width - mapped.width
         )
       );
       mapped.top = Math.max(
         0,
         Math.min(
-          coords.top - mapped.height / 2 + coords.height / 2,
+          coords.top - (mapped.height / 2) + (coords.height / 2),
           clip.window.height - mapped.height
         )
       );
@@ -113,7 +113,7 @@
       clip.thumbnail = canvas.toDataURL('image/png');
 
       resolve();
-    };
+    });
     img.src = clip.screenshot;
   };
 })();

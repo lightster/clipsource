@@ -5,7 +5,9 @@
     "globals": [
       "chrome",
       "document",
-      "location"
+      "Image",
+      "location",
+      "window"
     ],
     "rules": {
       "no-unused-vars": ["error", {"args": "none"}]

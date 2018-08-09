@@ -2,17 +2,8 @@
   const doc = document;
   const buffer = doc.createElement('div');
 
-  const constrainBox = (inner, width, height) => {
-    return {
-      left: Math.max(inner.left, 0),
-      top: Math.max(inner.top, 0),
-      width: Math.min(inner.width, width),
-      height: Math.min(inner.height, height)
-    };
-  };
-
   chrome.storage.local.get(['history', 'recent'], storage => {
-    for (let clip of storage.history) {
+    for (const clip of storage.history) {
       if (!clip.thumbnail) {
         continue;
       }
