@@ -8,55 +8,13 @@
     };
   };
 
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action !== 'copy') {
-      return;
-    }
-
-    const clipboardPromise = new Promise((resolve, reject) => {
-      const buffer = document.getElementById('buffer');
-      buffer.value = '';
-      buffer.addEventListener('paste', event => {
-        setTimeout(() => {
-          request.clipboardData = buffer.value;
-
-          resolve();
-        });
-      });
-      buffer.select();
-
-      if (!document.execCommand('paste')) {
-        console.log('Could not retrieve contents from clipboard.');
-      }
-    });
-
-    const screenshotPromise = new Promise((resolve, reject) => {
-      chrome.tabs.captureVisibleTab(null, {format: 'png'}, dataUri => {
-        request.screenshot = dataUri;
-        createThumbnail(request, resolve);
-      });
-    });
-
-    Promise.all([clipboardPromise, screenshotPromise]).then(() => {
-      chrome.storage.local.get(['recent', 'history'], storage => {
-        if (!storage.recent) {
-          storage.recent = [];
-        }
-        if (!storage.history) {
-          storage.history = [];
-        }
-
-        storage.recent.unshift(request);
-        storage.recent = storage.recent.slice(0, 10);
-
-        storage.history.push(request);
-
-        chrome.storage.local.set(storage);
-      });
+  const captureScreenshot = () => new Promise((resolve, reject) => {
+    chrome.tabs.captureVisibleTab(null, {format: 'png'}, dataUri => {
+      resolve(dataUri);
     });
   });
 
-  const createThumbnail = (clip, resolve) => {
+  const createThumbnail = clip => new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
@@ -110,10 +68,56 @@
         mapped.left, mapped.top, mapped.width, mapped.height,
         0, 0, canvas.width, canvas.height
       );
-      clip.thumbnail = canvas.toDataURL('image/png');
 
-      resolve();
+      resolve(canvas.toDataURL('image/png'));
     });
+
     img.src = clip.screenshot;
-  };
+  });
+
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action !== 'copy') {
+      return;
+    }
+
+    const clipboardPromise = new Promise((resolve, reject) => {
+      const buffer = document.getElementById('buffer');
+      buffer.value = '';
+      buffer.addEventListener('paste', event => {
+        setTimeout(() => {
+          request.clipboardData = buffer.value;
+
+          resolve();
+        });
+      });
+      buffer.select();
+
+      if (!document.execCommand('paste')) {
+        console.log('Could not retrieve contents from clipboard.');
+      }
+    });
+
+    const screenshotPromise = async () => {
+      request.screenshot = await captureScreenshot();
+      request.thumbnail = await createThumbnail(request);
+    };
+
+    Promise.all([clipboardPromise, screenshotPromise()]).then(() => {
+      chrome.storage.local.get(['recent', 'history'], storage => {
+        if (!storage.recent) {
+          storage.recent = [];
+        }
+        if (!storage.history) {
+          storage.history = [];
+        }
+
+        storage.recent.unshift(request);
+        storage.recent = storage.recent.slice(0, 10);
+
+        storage.history.push(request);
+
+        chrome.storage.local.set(storage);
+      });
+    });
+  });
 })();
