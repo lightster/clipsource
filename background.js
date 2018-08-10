@@ -1,4 +1,13 @@
 (function () {
+  const constrainBox = (inner, width, height) => {
+    return {
+      left: Math.max(inner.left, 0),
+      top: Math.max(inner.top, 0),
+      width: Math.min(inner.width, width),
+      height: Math.min(inner.height, height)
+    };
+  };
+
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action !== 'copy') {
       return;
@@ -46,15 +55,6 @@
       });
     });
   });
-
-  const constrainBox = (inner, width, height) => {
-    return {
-      left: Math.max(inner.left, 0),
-      top: Math.max(inner.top, 0),
-      width: Math.min(inner.width, width),
-      height: Math.min(inner.height, height)
-    };
-  };
 
   const createThumbnail = (clip, resolve) => {
     const canvas = document.createElement('canvas');
