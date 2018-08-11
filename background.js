@@ -8,101 +8,128 @@
     };
   };
 
+  const constrainAxis = (point, max) => {
+    return Math.max(0, Math.min(point, max));
+  };
+
   const captureScreenshot = () => new Promise((resolve, reject) => {
-    chrome.tabs.captureVisibleTab(null, {format: 'png'}, dataUri => {
-      resolve(dataUri);
+    chrome.tabs.captureVisibleTab(null, {format: 'png'}, dataUrl => {
+      const image = new Image();
+
+      image.addEventListener('load', () => {
+        resolve({
+          screenshot: {
+            dataUrl,
+            width: image.width,
+            height: image.height
+          },
+          image
+        });
+      });
+
+      image.src = dataUrl;
     });
   });
 
-  const createThumbnail = clip => new Promise((resolve, reject) => {
+  const calculateViewPort = (clip, width, height) => {
+    const coords = constrainBox(clip.selectionCoordinates, clip.screenshot.width, clip.screenshot.height);
+
+    const mapped = {};
+    if (coords.width / coords.height > width / height) {
+      if (coords.width <= width) {
+        mapped.width = width;
+      } else {
+        mapped.width = width * 1.2;
+      }
+      mapped.height = (mapped.width * height / width);
+    } else {
+      if (coords.height <= height) {
+        mapped.height = height;
+      } else {
+        mapped.height = height * 1.2;
+      }
+      mapped.width = (mapped.height * width / height);
+    }
+
+    mapped.left = constrainAxis(
+      coords.left - (mapped.width / 2) + (coords.width / 2),
+      clip.window.width - mapped.width
+    );
+    mapped.top = constrainAxis(
+      coords.top - (mapped.height / 2) + (coords.height / 2),
+      clip.window.height - mapped.height
+    );
+
+    return mapped;
+  };
+
+  const scaleCoordinates = (mapped, scaleX, scaleY) => {
+    return {
+      left: mapped.left * scaleX,
+      top: mapped.top * scaleY,
+      width: mapped.width * scaleX,
+      height: mapped.height * scaleY
+    };
+  };
+
+  const createThumbnail = (clip, image) => new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const img = new Image();
 
     canvas.width = 516;
     canvas.height = 290;
     ctx.imageSmoothingQuality = 'high';
 
-    img.addEventListener('load', () => {
-      const coords = constrainBox(clip.selectionCoordinates, img.width, img.height);
+    const mapped = calculateViewPort(clip, canvas.width, canvas.height);
+    const scaled = scaleCoordinates(
+      mapped,
+      clip.screenshot.width / clip.window.width,
+      clip.screenshot.height / clip.window.height
+    );
 
-      const mapped = {};
-      if (coords.width / coords.height > canvas.width / canvas.height) {
-        if (coords.width <= canvas.width) {
-          mapped.width = canvas.width;
-        } else {
-          mapped.width = canvas.width * 1.2;
-        }
-        mapped.height = (mapped.width * canvas.height / canvas.width);
-      } else {
-        if (coords.height <= canvas.height) {
-          mapped.height = canvas.height;
-        } else {
-          mapped.height = canvas.height * 1.2;
-        }
-        mapped.width = (mapped.height * canvas.width / canvas.height);
-      }
+    ctx.drawImage(
+      image,
+      scaled.left, scaled.top, scaled.width, scaled.height,
+      0, 0, canvas.width, canvas.height
+    );
 
-      mapped.left = Math.max(
-        0,
-        Math.min(
-          coords.left - (mapped.width / 2) + (coords.width / 2),
-          clip.window.width - mapped.width
-        )
-      );
-      mapped.top = Math.max(
-        0,
-        Math.min(
-          coords.top - (mapped.height / 2) + (coords.height / 2),
-          clip.window.height - mapped.height
-        )
-      );
-
-      mapped.left *= img.width / clip.window.width;
-      mapped.top *= img.height / clip.window.height;
-      mapped.width *= img.width / clip.window.width;
-      mapped.height *= img.height / clip.window.height;
-
-      ctx.drawImage(
-        img,
-        mapped.left, mapped.top, mapped.width, mapped.height,
-        0, 0, canvas.width, canvas.height
-      );
-
-      resolve(canvas.toDataURL('image/png'));
+    resolve({
+      dataUrl: canvas.toDataURL('image/png'),
+      width: canvas.width,
+      height: canvas.height
     });
-
-    img.src = clip.screenshot;
   });
+
+  const saveClipboard = clip => new Promise((resolve, reject) => {
+    const buffer = document.getElementById('buffer');
+    buffer.value = '';
+    buffer.addEventListener('paste', event => {
+      setTimeout(() => {
+        clip.clipboardData = buffer.value;
+
+        resolve();
+      });
+    });
+    buffer.select();
+
+    if (!document.execCommand('paste')) {
+      console.log('Could not retrieve contents from clipboard.');
+    }
+  });
+
+  const saveImages = async clip => {
+    const {screenshot, image} = await captureScreenshot();
+    clip.screenshot = screenshot;
+    clip.thumbnail = await createThumbnail(clip, image);
+  };
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action !== 'copy') {
       return;
     }
 
-    const clipboardPromise = new Promise((resolve, reject) => {
-      const buffer = document.getElementById('buffer');
-      buffer.value = '';
-      buffer.addEventListener('paste', event => {
-        setTimeout(() => {
-          request.clipboardData = buffer.value;
-
-          resolve();
-        });
-      });
-      buffer.select();
-
-      if (!document.execCommand('paste')) {
-        console.log('Could not retrieve contents from clipboard.');
-      }
-    });
-
-    const screenshotPromise = async () => {
-      request.screenshot = await captureScreenshot();
-      request.thumbnail = await createThumbnail(request);
-    };
-
-    Promise.all([clipboardPromise, screenshotPromise()]).then(() => {
+    const clip = request;
+    Promise.all([saveClipboard(clip), saveImages(clip)]).then(() => {
       chrome.storage.local.get(['recent', 'history'], storage => {
         if (!storage.recent) {
           storage.recent = [];

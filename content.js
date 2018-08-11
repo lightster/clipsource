@@ -10,7 +10,7 @@
         action: 'copy',
         title: document.title,
         clippedTime: Date.now(),
-        og: og,
+        og,
         window: {width: window.innerWidth, height: window.innerHeight},
         selectionCoordinates: window.getSelection().getRangeAt(0).getBoundingClientRect(),
         url: location.href

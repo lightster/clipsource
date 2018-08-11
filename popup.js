@@ -4,7 +4,7 @@
 
   chrome.storage.local.get(['history', 'recent'], storage => {
     for (const clip of storage.history) {
-      if (!clip.thumbnail) {
+      if (!clip.thumbnail || !clip.thumbnail.dataUrl) {
         continue;
       }
 
@@ -16,7 +16,7 @@
       const clipDiv = doc.createElement('div');
       clipDiv.setAttribute('class', 'clip');
       clipDiv.innerHTML = `
-        <div class="clip-screenshot" style="background-image: url(${clip.thumbnail});">
+        <div class="clip-screenshot" style="background-image: url(${clip.thumbnail.dataUrl});">
           <div class="clip-summary">
             ${summary}
           </div>
