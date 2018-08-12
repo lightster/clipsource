@@ -2,6 +2,13 @@
   const doc = document;
   const buffer = doc.createElement('div');
 
+  window.addEventListener('load', () => {
+    console.log(location.hash);
+    if (location.hash === '#popup') {
+      document.getElementById('brand-link').setAttribute('target', '_blank');
+    }
+  });
+
   chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
     if (!storage.clips) {
       return;
