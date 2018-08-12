@@ -2,11 +2,13 @@
   const doc = document;
   const buffer = doc.createElement('div');
 
-  chrome.storage.local.get(['history', 'recent'], storage => {
-    for (const clip of storage.history) {
-      if (!clip.thumbnail || !clip.thumbnail.dataUrl || !clip.clipboard) {
-        continue;
-      }
+  chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
+    if (!storage.clips) {
+      return;
+    }
+
+    for (const uid of storage.recent) {
+      const clip = storage.clips[uid];
 
       let summary = clip.clipboard.plain.trim();
       if (summary.length > 60) {

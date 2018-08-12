@@ -163,7 +163,12 @@
 
     const clip = request;
     Promise.all([saveClipboard(clip), saveImages(clip)]).then(() => {
-      chrome.storage.local.get(['recent', 'history'], storage => {
+      chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
+        clip.uid = btoa(clip).substring(0, 20).concat(clip.clippedTime);
+
+        if (!storage.clips) {
+          storage.clips = {};
+        }
         if (!storage.recent) {
           storage.recent = [];
         }
@@ -171,10 +176,10 @@
           storage.history = [];
         }
 
-        storage.recent.unshift(request);
+        storage.clips[clip.uid] = clip;
+        storage.recent.unshift(clip.uid);
         storage.recent = storage.recent.slice(0, 10);
-
-        storage.history.push(request);
+        storage.history.push(clip.uid);
 
         chrome.storage.local.set(storage);
       });
