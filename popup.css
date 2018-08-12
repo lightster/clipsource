@@ -91,6 +91,10 @@ a.brand {
   white-space: nowrap;
 }
 
+.clip-summary:empty {
+  display: none;
+}
+
 .clip-details {
   background-color: inherit;
   box-sizing: border-box;

@@ -8,7 +8,7 @@
         continue;
       }
 
-      let summary = clip.clipboard.plain;
+      let summary = clip.clipboard.plain.trim();
       if (summary.length > 60) {
         summary = summary.substr(0, 25) + ' ... ' + summary.substr(summary.length - 25);
       }
@@ -17,9 +17,7 @@
       clipDiv.setAttribute('class', 'clip');
       clipDiv.innerHTML = `
         <div class="clip-screenshot" style="background-image: url(${clip.thumbnail.dataUrl});">
-          <div class="clip-summary">
-            ${summary}
-          </div>
+          <div class="clip-summary">${summary}</div>
         </div>
         <div class="clip-details">
           <h2><a href="" target="_blank"></a></h2>
