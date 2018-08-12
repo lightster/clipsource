@@ -4,7 +4,7 @@
 
   window.addEventListener('load', () => {
     console.log(location.hash);
-    if (location.hash === '#popup') {
+    if (location.hash === '#/popup') {
       document.getElementById('brand-link').setAttribute('target', '_blank');
     }
   });
