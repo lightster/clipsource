@@ -4,11 +4,11 @@
 
   chrome.storage.local.get(['history', 'recent'], storage => {
     for (const clip of storage.history) {
-      if (!clip.thumbnail || !clip.thumbnail.dataUrl) {
+      if (!clip.thumbnail || !clip.thumbnail.dataUrl || !clip.clipboard) {
         continue;
       }
 
-      let summary = clip.clipboardData;
+      let summary = clip.clipboard.plain;
       if (summary.length > 60) {
         summary = summary.substr(0, 25) + ' ... ' + summary.substr(summary.length - 25);
       }
@@ -31,7 +31,7 @@
       link.setAttribute('href', clip.url);
       link.appendChild(doc.createTextNode(clip.title ? clip.title : link.hostname));
 
-      clipDiv.querySelector('blockquote').appendChild(doc.createTextNode(clip.clipboardData));
+      clipDiv.querySelector('blockquote').appendChild(doc.createTextNode(clip.clipboard.plain));
 
       buffer.appendChild(clipDiv);
       doc.getElementById('clips').innerHTML = buffer.innerHTML;

@@ -100,14 +100,18 @@
     });
   });
 
-  const saveClipboard = clip => new Promise((resolve, reject) => {
-    const buffer = document.getElementById('buffer');
+  const capturePlainText = clip => new Promise((resolve, reject) => {
+    const body = document.getElementsByTagName('body')[0];
+    const buffer = document.createElement('textarea');
+
+    body.appendChild(buffer);
+
     buffer.value = '';
     buffer.addEventListener('paste', event => {
       setTimeout(() => {
-        clip.clipboardData = buffer.value;
+        body.removeChild(buffer);
 
-        resolve();
+        resolve(buffer.value);
       });
     });
     buffer.select();
@@ -116,6 +120,35 @@
       console.log('Could not retrieve contents from clipboard.');
     }
   });
+
+  const captureHtml = clip => new Promise((resolve, reject) => {
+    const body = document.getElementsByTagName('body')[0];
+    const buffer = document.createElement('div');//getElementById('formatted-buffer');
+
+    body.appendChild(buffer);
+
+    buffer.setAttribute('contenteditable', true);
+    buffer.innerHTML = '';
+    buffer.addEventListener('paste', event => {
+      setTimeout(() => {
+        body.removeChild(buffer);
+
+        resolve(buffer.innerHTML);
+      });
+    });
+    buffer.focus();
+
+    if (!document.execCommand('paste')) {
+      console.log('Could not retrieve contents from clipboard.');
+    }
+  });
+
+  const saveClipboard = async clip => {
+    clip.clipboard = {
+      plain: await capturePlainText(clip),
+      html: await captureHtml(clip)
+    };
+  };
 
   const saveImages = async clip => {
     const {screenshot, image} = await captureScreenshot();
