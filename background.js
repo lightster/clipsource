@@ -164,7 +164,11 @@
     const clip = request;
     Promise.all([saveClipboard(clip), saveImages(clip)]).then(() => {
       chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
-        clip.uid = btoa(clip).substring(0, 20).concat(clip.clippedTime);
+        clip.uid = btoa(clip.clipboard.plain)
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .substring(0, 20)
+          .concat('-')
+          .concat(clip.clippedTime);
 
         if (!storage.clips) {
           storage.clips = {};
