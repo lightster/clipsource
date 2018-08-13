@@ -45,7 +45,7 @@ a.brand {
   color: #5F71FF;
 }
 
-#clips {
+#content {
   margin-top: 47px;
   margin-bottom: 5px;
   display: flex;
@@ -64,6 +64,7 @@ a.brand {
   border-radius: 7px;
   flex: none;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .clip:hover {
