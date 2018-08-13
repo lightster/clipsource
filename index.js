@@ -26,9 +26,12 @@
       clipDiv.setAttribute('class', 'clip');
       clipDiv.innerHTML = `
         <div class="clip-screenshot" style="background-image: url(${clip.thumbnail.dataUrl});">
-          <div class="clip-summary">${summary}</div>
+          <div class="clip-summary"></div>
         </div>
       `;
+
+      const summaryDiv = clipDiv.querySelector('.clip-summary');
+      summaryDiv.appendChild(doc.createTextNode(summary));
 
       buffer.appendChild(clipDiv);
       doc.getElementById('clips').innerHTML = buffer.innerHTML;
