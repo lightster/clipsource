@@ -3,9 +3,10 @@
   const buffer = doc.createElement('div');
 
   window.addEventListener('load', () => {
-    console.log(location.hash);
     if (location.hash === '#/popup') {
-      document.getElementById('brand-link').setAttribute('target', '_blank');
+      const baseTag = document.createElement('base');
+      baseTag.setAttribute('target', '_blank');
+      document.getElementsByTagName('head')[0].appendChild(baseTag);
     }
   });
 
