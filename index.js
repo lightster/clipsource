@@ -54,19 +54,15 @@
           summary = summary.substr(0, 25) + ' ... ' + summary.substr(summary.length - 25);
         }
 
-        const clipDiv = doc.createElement('div');
-        clipDiv.setAttribute('class', 'clip');
-        clipDiv.setAttribute('data-clipsource-uid', uid);
-        clipDiv.innerHTML = `
-          <div class="clip-screenshot" style="background-image: url(${clip.thumbnail.dataUrl});">
-            <div class="clip-summary"></div>
-          </div>
-        `;
+        const div = createFromTemplate('list/clip');
+        div.clip.setAttribute('data-clipsource-uid', uid);
+        div.screenshot.setAttribute(
+          'style',
+          `background-image: url(${clip.thumbnail.dataUrl});`
+        );
+        div.summary.textContent = summary;
 
-        const summaryDiv = clipDiv.querySelector('.clip-summary');
-        summaryDiv.appendChild(doc.createTextNode(summary));
-
-        buffer.appendChild(clipDiv);
+        buffer.appendChild(div);
       }
 
       output(buffer.innerHTML);
@@ -92,6 +88,22 @@
     };
 
     renderer(output);
+  };
+
+  const createFromTemplate = (name) => {
+    if (name === 'list/clip') {
+      const clone = cloneTemplate('list-clip-template');
+
+      clone.clip = clone.querySelector('.clip');
+      clone.screenshot = clone.querySelector('.clip-screenshot');
+      clone.summary = clone.querySelector('.clip-summary');
+
+      return clone;
+    }
+  };
+
+  const cloneTemplate = (id) => {
+    return document.importNode(document.querySelector(`#${id}`).content, true);
   };
 
   const isInExtensionPopup = () => {
