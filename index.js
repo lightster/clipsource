@@ -111,32 +111,44 @@
 
   const createFromTemplate = (name) => {
     if (name === 'list/clip') {
-      const clone = cloneTemplate('list-clip-template');
+      const dom = cloneTemplate('list-clip-template', {
+        clip: '.clip',
+        screenshot: '.clip-screenshot',
+        summary: '.clip-summary'
+      });
 
-      clone.clip = clone.querySelector('.clip');
-      clone.screenshot = clone.querySelector('.clip-screenshot');
-      clone.summary = clone.querySelector('.clip-summary');
-
-      return clone;
+      return dom;
     } else if (name === 'clip/details') {
-      const clone = cloneTemplate('clip-details-template');
+      const dom = cloneTemplate('clip-details-template', {
+        clipDetails: '.clip-details',
+        clipTitle: '.clip-title',
+        clipTime: '.clip-time',
+        clipScreenshot: '.clip-screenshot',
+        clipboardPlain: '.clip-clipboard-plain',
+        clipboardHtml: '.clip-clipboard-html'
+      });
 
-      clone.clipDetails = clone.querySelector('.clip-details');
-      clone.clipTitle = clone.querySelector('.clip-title');
-      clone.clipTime = clone.querySelector('.clip-time');
-      clone.clipScreenshot = clone.querySelector('.clip-screenshot');
-      clone.clipboardPlain = clone.querySelector('.clip-clipboard-plain');
-      clone.clipboardHtml = clone.querySelector('.clip-clipboard-html');
-
-      return clone;
+      return dom;
     }
   };
 
-  const cloneTemplate = (id) => {
-    return document.importNode(document.querySelector(`#${id}`).content, true);
+  const cloneTemplate = (id, selectors = {}) => {
+    const fragment = document.importNode(document.querySelector(`#${id}`).content, true);
+
+    Object.keys(selectors).forEach(key => {
+      fragment[key] = fragment.querySelector(selectors[key]);
+      fragment[key].setClipAction = setClipAction;
+    });
+
+    return fragment;
   };
 
   const isInExtensionPopup = () => {
     return location.hash === '#/popup';
+  };
+
+  const setClipAction = function (uid, action) {
+    this.setAttribute('data-clipsource-uid', uid);
+    this.addEventListener('click', action);
   };
 })();
