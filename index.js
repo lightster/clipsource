@@ -45,6 +45,7 @@
       }
 
       const buffer = doc.createElement('div');
+      buffer.setAttribute('class', 'clips');
 
       for (const uid of storage.recent) {
         const clip = storage.clips[uid];
@@ -65,11 +66,10 @@
         buffer.appendChild(div);
       }
 
-      output(buffer.innerHTML);
+      output(buffer);
     }),
 
     clip: (uid) => (output) => chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
-      const buffer = doc.createElement('div');
       const clip = storage.clips[uid];
 
       const dom = createFromTemplate('clip/details');
@@ -82,9 +82,7 @@
       dom.clipboardPlain.textContent = clip.clipboard.plain;
       dom.clipboardHtml.innerHTML = clip.clipboard.html;
 
-      buffer.appendChild(dom);
-
-      output(buffer.innerHTML);
+      output(dom);
     })
   };
 
@@ -99,11 +97,8 @@
 
   const render = (renderer) => {
     const output = (html) => {
-      if (html instanceof DocumentFragment) {
-        content.innerHTML = '';
-        content.appendChild(html);
-      }
-      content.innerHTML = html;
+      content.innerHTML = '';
+      content.appendChild(html);
     };
 
     renderer(output);
