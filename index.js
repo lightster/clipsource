@@ -68,9 +68,24 @@
       output(buffer.innerHTML);
     }),
 
-    clip: (uid) => (output) => {
-      output(uid);
-    }
+    clip: (uid) => (output) => chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
+      const buffer = doc.createElement('div');
+      const clip = storage.clips[uid];
+
+      const dom = createFromTemplate('clip/details');
+      dom.clipTitle.textContent = (clip.og.title || clip.og.title);
+      dom.clipTime.textContent = (new Date(clip.clippedTime)).toLocaleString();
+      dom.clipScreenshot.setAttribute(
+        'style',
+        `background-image: url(${clip.thumbnail.dataUrl}); width: ${clip.thumbnail.width}px; height: ${clip.thumbnail.height}px;`
+      );
+      dom.clipboardPlain.textContent = clip.clipboard.plain;
+      dom.clipboardHtml.innerHTML = clip.clipboard.html;
+
+      buffer.appendChild(dom);
+
+      output(buffer.innerHTML);
+    })
   };
 
   const route = () => {
@@ -84,6 +99,10 @@
 
   const render = (renderer) => {
     const output = (html) => {
+      if (html instanceof DocumentFragment) {
+        content.innerHTML = '';
+        content.appendChild(html);
+      }
       content.innerHTML = html;
     };
 
@@ -97,6 +116,17 @@
       clone.clip = clone.querySelector('.clip');
       clone.screenshot = clone.querySelector('.clip-screenshot');
       clone.summary = clone.querySelector('.clip-summary');
+
+      return clone;
+    } else if (name === 'clip/details') {
+      const clone = cloneTemplate('clip-details-template');
+
+      clone.clipDetails = clone.querySelector('.clip-details');
+      clone.clipTitle = clone.querySelector('.clip-title');
+      clone.clipTime = clone.querySelector('.clip-time');
+      clone.clipScreenshot = clone.querySelector('.clip-screenshot');
+      clone.clipboardPlain = clone.querySelector('.clip-clipboard-plain');
+      clone.clipboardHtml = clone.querySelector('.clip-clipboard-html');
 
       return clone;
     }

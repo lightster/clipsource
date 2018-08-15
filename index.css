@@ -97,22 +97,10 @@ a.brand {
 }
 
 .clip-details {
-  background-color: inherit;
   box-sizing: border-box;
-  display: none;
   margin: 0;
   padding: 10px 15px;
-  height: 100%;
-  width: 100%;
 }
-
-/* .clip:hover .clip-screenshot { */
-/*   display: none; */
-/* } */
-
-/* .clip:hover .clip-details { */
-/*   display: block; */
-/* } */
 
 .clip-details h2 {
   background-color: inherit;
