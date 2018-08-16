@@ -28,6 +28,14 @@
     },
 
     delete: (clip, event) => {
+      clip.deletedAt = Date.now();
+
+      chrome.storage.local.get(['clips'], storage => {
+        storage.clips[clip.uid] = clip;
+        chrome.storage.local.set({
+          clips: storage.clips
+        })
+      });
     },
 
     copy: (clip, event) => {
@@ -81,6 +89,10 @@
 
       for (const uid of storage.recent) {
         const clip = storage.clips[uid];
+
+        if (clip.deletedAt) {
+          continue;
+        }
 
         let summary = clip.clipboard.plain.trim();
         if (summary.length > 60) {

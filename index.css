@@ -109,10 +109,6 @@ a.brand {
   color: #eeeeee;
 }
 
-.clip-actions .clip-action-delete {
-  display: none;
-}
-
 .clip-summary {
   font-size: 1rem;
   position: absolute;
