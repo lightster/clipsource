@@ -16,7 +16,7 @@
   });
 
   const actions = {
-    view: function (clip, event) {
+    view: (clip, event) => {
       const clipUrl = `#/clip/${clip.uid}`;
       const modifierKey = event.ctrlKey || event.metaKey;
 
@@ -25,6 +25,23 @@
       } else {
         location.hash = clipUrl;
       }
+    },
+
+    delete: (clip, event) => {
+    },
+
+    copy: (clip, event) => {
+      const listener = (event) => {
+        event.target.removeEventListener('copy', listener);
+
+        event.clipboardData.setData('text/plain', clip.clipboard.plain);
+        event.clipboardData.setData('text/html', clip.clipboard.html);
+
+        event.preventDefault();
+      };
+
+      event.target.addEventListener('copy', listener);
+      document.execCommand('copy');
     }
   };
 
@@ -72,6 +89,8 @@
 
         const div = createFromTemplate('list/clip');
         div.clip.setClipAction(uid, 'view');
+        div.deleteAction.setClipAction(uid, 'delete');
+        div.copyAction.setClipAction(uid, 'copy');
         div.screenshot.setAttribute(
           'style',
           `background-image: url(${clip.thumbnail.dataUrl});`
@@ -124,7 +143,9 @@
       const dom = cloneTemplate('list-clip-template', {
         clip: '.clip',
         screenshot: '.clip-screenshot',
-        summary: '.clip-summary'
+        summary: '.clip-summary',
+        deleteAction: '.clip-action-delete',
+        copyAction: '.clip-action-copy'
       });
 
       return dom;

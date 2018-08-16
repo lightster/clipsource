@@ -74,6 +74,10 @@ a.brand {
   border-color: #898989;
 }
 
+.clip:hover .clip-actions {
+  display: initial;
+}
+
 .clip-screenshot {
   background-position: center;
   background-size: cover;
@@ -81,6 +85,32 @@ a.brand {
   height: 100%;
   width: 100%;
   position: relative;
+}
+
+.clip-actions {
+  position: absolute;
+  right: 10px;
+  display: none;
+  list-style-type: none;
+}
+
+.clip-actions li {
+  display: inline-block;
+  font-size: 1.1rem;
+  background-color: #4f4f4f;
+  border: 2px solid #dddddd;
+  border-radius: 7px;
+  margin: 0 2px 0 0;
+  box-sizing: border-box;
+}
+
+.clip-actions i {
+  padding: 9px;
+  color: #eeeeee;
+}
+
+.clip-actions .clip-action-delete {
+  display: none;
 }
 
 .clip-summary {
