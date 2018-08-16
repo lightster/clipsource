@@ -15,6 +15,19 @@
     render(route());
   });
 
+  const actions = {
+    view: function (clip, event) {
+      const clipUrl = `#/clip/${clip.uid}`;
+      const modifierKey = event.ctrlKey || event.metaKey;
+
+      if (isInExtensionPopup() || modifierKey) {
+        window.open(clipUrl, modifierKey ? '_blank' : 'clipsource');
+      } else {
+        location.hash = clipUrl;
+      }
+    }
+  };
+
   document.addEventListener('click', (event) => {
     let target = event.target;
     while (target && target.hasAttribute && !target.hasAttribute('data-clipsource-uid')) {
@@ -26,12 +39,14 @@
     }
 
     const uid = target.getAttribute('data-clipsource-uid');
-    const clipUrl = `#/clip/${uid}`;
-    if (isInExtensionPopup()) {
-      window.open(clipUrl, 'clipsource');
-    } else {
-      location.hash = clipUrl;
-    }
+    const action = target.getAttribute('data-clipsource-action');
+
+    chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
+      const clip = storage.clips[uid];
+      actions[action](clip, event);
+    });
+
+    event.stopPropagation();
   });
 
   window.addEventListener('hashchange', (event) => {
@@ -56,7 +71,7 @@
         }
 
         const div = createFromTemplate('list/clip');
-        div.clip.setAttribute('data-clipsource-uid', uid);
+        div.clip.setClipAction(uid, 'view');
         div.screenshot.setAttribute(
           'style',
           `background-image: url(${clip.thumbnail.dataUrl});`
@@ -144,6 +159,6 @@
 
   const setClipAction = function (uid, action) {
     this.setAttribute('data-clipsource-uid', uid);
-    this.addEventListener('click', action);
+    this.setAttribute('data-clipsource-action', action);
   };
 })();
