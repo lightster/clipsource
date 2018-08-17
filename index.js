@@ -32,9 +32,7 @@
 
       chrome.storage.local.get(['clips'], storage => {
         storage.clips[clip.uid] = clip;
-        chrome.storage.local.set({
-          clips: storage.clips
-        })
+        chrome.storage.local.set({clips: storage.clips}, () => render(route()));
       });
     },
 
