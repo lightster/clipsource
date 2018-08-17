@@ -64,7 +64,7 @@
     const uid = target.getAttribute('data-clipsource-uid');
     const action = target.getAttribute('data-clipsource-action');
 
-    chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
+    chrome.storage.local.get(['clips'], storage => {
       const clip = storage.clips[uid];
       actions[action](clip, event);
     });
@@ -113,7 +113,7 @@
       output(buffer);
     }),
 
-    clip: (uid) => (output) => chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
+    clip: (uid) => (output) => chrome.storage.local.get(['clips'], storage => {
       const clip = storage.clips[uid];
 
       const dom = createFromTemplate('clip/details');
