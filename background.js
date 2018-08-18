@@ -123,7 +123,7 @@
 
   const captureHtml = clip => new Promise((resolve, reject) => {
     const body = document.getElementsByTagName('body')[0];
-    const buffer = document.createElement('div');//getElementById('formatted-buffer');
+    const buffer = document.createElement('div');
 
     body.appendChild(buffer);
 

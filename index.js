@@ -1,83 +1,65 @@
 (function () {
   const doc = document;
-  let container, content;
+  let content;
 
-  window.addEventListener('load', () => {
-    container = document.getElementById('container');
-    content = document.getElementById('content');
+  const isInExtensionPopup = () => {
+    return location.hash === '#/popup';
+  };
 
-    if (isInExtensionPopup()) {
-      const baseTag = document.createElement('base');
-      baseTag.setAttribute('target', 'clipsource');
-      document.getElementsByTagName('head')[0].appendChild(baseTag);
+  const setClipAction = function (uid, action) {
+    this.setAttribute('data-clipsource-uid', uid);
+    this.setAttribute('data-clipsource-action', action);
+  };
+
+  const render = renderer => {
+    const output = html => {
+      content.innerHTML = '';
+      content.appendChild(html);
+    };
+
+    renderer(output);
+  };
+
+  const cloneTemplate = (id, selectors = {}) => {
+    const fragment = document.importNode(document.querySelector(`#${id}`).content, true);
+
+    Object.keys(selectors).forEach(key => {
+      fragment[key] = fragment.querySelector(selectors[key]);
+      fragment[key].setClipAction = setClipAction;
+    });
+
+    return fragment;
+  };
+
+  const createFromTemplate = name => {
+    if (name === 'list/clip') {
+      const dom = cloneTemplate('list-clip-template', {
+        clip: '.clip',
+        screenshot: '.clip-screenshot',
+        summary: '.clip-summary',
+        deleteAction: '.clip-action-delete',
+        copyAction: '.clip-action-copy'
+      });
+
+      return dom;
     }
 
-    render(route());
-  });
-
-  const actions = {
-    view: (clip, event) => {
-      const clipUrl = `#/clip/${clip.uid}`;
-      const modifierKey = event.ctrlKey || event.metaKey;
-
-      if (isInExtensionPopup() || modifierKey) {
-        window.open(clipUrl, modifierKey ? '_blank' : 'clipsource');
-      } else {
-        location.hash = clipUrl;
-      }
-    },
-
-    delete: (clip, event) => {
-      clip.deletedAt = Date.now();
-
-      chrome.storage.local.get(['clips'], storage => {
-        storage.clips[clip.uid] = clip;
-        chrome.storage.local.set({clips: storage.clips}, () => render(route()));
+    if (name === 'clip/details') {
+      const dom = cloneTemplate('clip-details-template', {
+        clipDetails: '.clip-details',
+        clipTitle: '.clip-title',
+        clipTime: '.clip-time',
+        clipScreenshot: '.clip-screenshot',
+        clipboardPlain: '.clip-clipboard-plain',
+        clipboardHtml: '.clip-clipboard-html'
       });
-    },
 
-    copy: (clip, event) => {
-      const listener = (event) => {
-        event.target.removeEventListener('copy', listener);
-
-        event.clipboardData.setData('text/plain', clip.clipboard.plain);
-        event.clipboardData.setData('text/html', clip.clipboard.html);
-
-        event.preventDefault();
-      };
-
-      event.target.addEventListener('copy', listener);
-      document.execCommand('copy');
+      return dom;
     }
   };
 
-  document.addEventListener('click', (event) => {
-    let target = event.target;
-    while (target && target.hasAttribute && !target.hasAttribute('data-clipsource-uid')) {
-      target = target.parentNode;
-    }
-
-    if (!target.hasAttribute || !target.hasAttribute('data-clipsource-uid')) {
-      return;
-    }
-
-    const uid = target.getAttribute('data-clipsource-uid');
-    const action = target.getAttribute('data-clipsource-action');
-
-    chrome.storage.local.get(['clips'], storage => {
-      const clip = storage.clips[uid];
-      actions[action](clip, event);
-    });
-
-    event.stopPropagation();
-  });
-
-  window.addEventListener('hashchange', (event) => {
-    render(route());
-  });
-
   const renderers = {
-    index: (output) => chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
+    index: output => chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
       if (!storage.clips) {
         return;
       }
@@ -113,7 +95,7 @@
       output(buffer);
     }),
 
-    clip: (uid) => (output) => chrome.storage.local.get(['clips'], storage => {
+    clip: uid => output => chrome.storage.local.get(['clips'], storage => {
       const clip = storage.clips[uid];
 
       const dom = createFromTemplate('clip/details');
@@ -131,65 +113,84 @@
   };
 
   const route = () => {
-    if (location.hash.match(/^#\/clip\/([^\/]+)/)) {
-      const [match, uid] = location.hash.match(/^#\/clip\/([^\/]+)/);
+    if (location.hash.match(/^#\/clip\/([^/]+)/)) {
+      const [, uid] = location.hash.match(/^#\/clip\/([^/]+)/);
       return renderers.clip(uid);
     }
 
     return renderers.index;
   };
 
-  const render = (renderer) => {
-    const output = (html) => {
-      content.innerHTML = '';
-      content.appendChild(html);
-    };
+  window.addEventListener('load', () => {
+    content = document.getElementById('content');
 
-    renderer(output);
-  };
+    if (isInExtensionPopup()) {
+      const baseTag = document.createElement('base');
+      baseTag.setAttribute('target', 'clipsource');
+      document.getElementsByTagName('head')[0].appendChild(baseTag);
+    }
 
-  const createFromTemplate = (name) => {
-    if (name === 'list/clip') {
-      const dom = cloneTemplate('list-clip-template', {
-        clip: '.clip',
-        screenshot: '.clip-screenshot',
-        summary: '.clip-summary',
-        deleteAction: '.clip-action-delete',
-        copyAction: '.clip-action-copy'
+    render(route());
+  });
+
+  const actions = {
+    view: (clip, event) => {
+      const clipUrl = `#/clip/${clip.uid}`;
+      const modifierKey = event.ctrlKey || event.metaKey;
+
+      if (isInExtensionPopup() || modifierKey) {
+        window.open(clipUrl, modifierKey ? '_blank' : 'clipsource');
+      } else {
+        location.hash = clipUrl;
+      }
+    },
+
+    delete: (clip, event) => {
+      clip.deletedAt = Date.now();
+
+      chrome.storage.local.get(['clips'], storage => {
+        storage.clips[clip.uid] = clip;
+        chrome.storage.local.set({clips: storage.clips}, () => render(route()));
       });
+    },
 
-      return dom;
-    } else if (name === 'clip/details') {
-      const dom = cloneTemplate('clip-details-template', {
-        clipDetails: '.clip-details',
-        clipTitle: '.clip-title',
-        clipTime: '.clip-time',
-        clipScreenshot: '.clip-screenshot',
-        clipboardPlain: '.clip-clipboard-plain',
-        clipboardHtml: '.clip-clipboard-html'
-      });
+    copy: (clip, event) => {
+      const listener = event => {
+        event.target.removeEventListener('copy', listener);
 
-      return dom;
+        event.clipboardData.setData('text/plain', clip.clipboard.plain);
+        event.clipboardData.setData('text/html', clip.clipboard.html);
+
+        event.preventDefault();
+      };
+
+      event.target.addEventListener('copy', listener);
+      document.execCommand('copy');
     }
   };
 
-  const cloneTemplate = (id, selectors = {}) => {
-    const fragment = document.importNode(document.querySelector(`#${id}`).content, true);
+  document.addEventListener('click', event => {
+    let {target} = event;
+    while (target && target.hasAttribute && !target.hasAttribute('data-clipsource-uid')) {
+      target = target.parentNode;
+    }
 
-    Object.keys(selectors).forEach(key => {
-      fragment[key] = fragment.querySelector(selectors[key]);
-      fragment[key].setClipAction = setClipAction;
+    if (!target.hasAttribute || !target.hasAttribute('data-clipsource-uid')) {
+      return;
+    }
+
+    const uid = target.getAttribute('data-clipsource-uid');
+    const action = target.getAttribute('data-clipsource-action');
+
+    chrome.storage.local.get(['clips'], storage => {
+      const clip = storage.clips[uid];
+      actions[action](clip, event);
     });
 
-    return fragment;
-  };
+    event.stopPropagation();
+  });
 
-  const isInExtensionPopup = () => {
-    return location.hash === '#/popup';
-  };
-
-  const setClipAction = function (uid, action) {
-    this.setAttribute('data-clipsource-uid', uid);
-    this.setAttribute('data-clipsource-action', action);
-  };
+  window.addEventListener('hashchange', event => {
+    render(route());
+  });
 })();

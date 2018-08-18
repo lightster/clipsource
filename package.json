@@ -3,6 +3,7 @@
   "xo": {
     "space": 2,
     "globals": [
+      "btoa",
       "chrome",
       "document",
       "Image",
