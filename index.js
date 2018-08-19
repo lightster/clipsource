@@ -29,6 +29,15 @@
       });
     },
 
+    loadById: async uid => {
+      const clip = Object.create(Clip);
+
+      const details = await clipStore.listDetails();
+      clip.init(details[uid]);
+
+      return clip;
+    },
+
     listDetails: function () {
       if (this.details) {
         return this.details;
@@ -45,9 +54,12 @@
   const clipStore = Object.create(ClipStore);
 
   const Clip = {
-    loadById: async uid => {
-      const details = await clipStore.listDetails();
-      return details[uid];
+    init: function (props) {
+      Object.assign(this, props);
+    },
+
+    image: async function (name) {
+      return this[name];
     }
   };
 
@@ -109,7 +121,7 @@
       buffer.setAttribute('class', 'clips');
 
       for (const uid of clipList) {
-        const clip = await Clip.loadById(uid);
+        const clip = await clipStore.loadById(uid);
 
         if (clip.deletedAt) {
           continue;
@@ -120,13 +132,15 @@
           summary = summary.substr(0, 25) + ' ... ' + summary.substr(summary.length - 25);
         }
 
+        const thumbnail = await clip.image('thumbnail');
+
         const div = createFromTemplate('list/clip');
         div.clip.setClipAction(uid, 'view');
         div.deleteAction.setClipAction(uid, 'delete');
         div.copyAction.setClipAction(uid, 'copy');
         div.screenshot.setAttribute(
           'style',
-          `background-image: url(${clip.thumbnail.dataUrl});`
+          `background-image: url(${thumbnail.dataUrl});`
         );
         div.summary.textContent = summary;
 
@@ -136,21 +150,22 @@
       output(buffer);
     },
 
-    clip: uid => output => chrome.storage.local.get(['clips'], storage => {
-      const clip = storage.clips[uid];
+    clip: uid => async (output) => {
+      const clip = await clipStore.loadById(uid);
+      const thumbnail = await clip.image('thumbnail');
 
       const dom = createFromTemplate('clip/details');
       dom.clipTitle.textContent = (clip.og.title || clip.og.title);
       dom.clipTime.textContent = (new Date(clip.clippedTime)).toLocaleString();
       dom.clipScreenshot.setAttribute(
         'style',
-        `background-image: url(${clip.thumbnail.dataUrl}); width: ${clip.thumbnail.width}px; height: ${clip.thumbnail.height}px;`
+        `background-image: url(${thumbnail.dataUrl}); width: ${thumbnail.width}px; height: ${thumbnail.height}px;`
       );
       dom.clipboardPlain.textContent = clip.clipboard.plain;
       dom.clipboardHtml.innerHTML = clip.clipboard.html;
 
       output(dom);
-    })
+    }
   };
 
   const route = () => {
