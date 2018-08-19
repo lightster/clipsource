@@ -18,18 +18,18 @@
   };
 
   const ClipStore = {
-    init: function () {
+    init() {
       this.details = null;
     },
 
-    list: () => {
+    list() {
       const key = 'history';
-      return BrowserStorage.get([key]).then((storage) => {
+      return BrowserStorage.get([key]).then(storage => {
         return storage[key];
       });
     },
 
-    loadById: async uid => {
+    async loadById(uid) {
       const clip = Object.create(Clip);
 
       const details = await clipStore.listDetails();
@@ -38,7 +38,7 @@
       return clip;
     },
 
-    listDetails: function () {
+    listDetails() {
       if (this.details) {
         return this.details;
       }
@@ -54,11 +54,11 @@
   const clipStore = Object.create(ClipStore);
 
   const Clip = {
-    init: function (props) {
+    init(props) {
       Object.assign(this, props);
     },
 
-    image: async function (name) {
+    async image(name) {
       return this[name];
     }
   };
@@ -111,7 +111,7 @@
   };
 
   const renderers = {
-    index: async (output) => {
+    index: async output => {
       const clipList = await clipStore.list();
       if (!clipList) {
         return;
@@ -150,7 +150,7 @@
       output(buffer);
     },
 
-    clip: uid => async (output) => {
+    clip: uid => async output => {
       const clip = await clipStore.loadById(uid);
       const thumbnail = await clip.image('thumbnail');
 
