@@ -11,6 +11,46 @@
     this.setAttribute('data-clipsource-action', action);
   };
 
+  const BrowserStorage = {
+    get: keys => new Promise(resolve => chrome.storage.local.get(keys, storage => {
+      resolve(storage);
+    }))
+  };
+
+  const ClipStore = {
+    init: function () {
+      this.details = null;
+    },
+
+    list: () => {
+      const key = 'history';
+      return BrowserStorage.get([key]).then((storage) => {
+        return storage[key];
+      });
+    },
+
+    listDetails: function () {
+      if (this.details) {
+        return this.details;
+      }
+
+      this.details = new Promise(resolve => chrome.storage.local.get('clips', ({clips}) => {
+        resolve(clips);
+      }));
+
+      return this.details;
+    }
+  };
+
+  const clipStore = Object.create(ClipStore);
+
+  const Clip = {
+    loadById: async uid => {
+      const details = await clipStore.listDetails();
+      return details[uid];
+    }
+  };
+
   const render = renderer => {
     const output = html => {
       content.innerHTML = '';
@@ -59,16 +99,17 @@
   };
 
   const renderers = {
-    index: output => chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
-      if (!storage.clips) {
+    index: async (output) => {
+      const clipList = await clipStore.list();
+      if (!clipList) {
         return;
       }
 
       const buffer = doc.createElement('div');
       buffer.setAttribute('class', 'clips');
 
-      for (const uid of storage.recent) {
-        const clip = storage.clips[uid];
+      for (const uid of clipList) {
+        const clip = await Clip.loadById(uid);
 
         if (clip.deletedAt) {
           continue;
@@ -93,7 +134,7 @@
       }
 
       output(buffer);
-    }),
+    },
 
     clip: uid => output => chrome.storage.local.get(['clips'], storage => {
       const clip = storage.clips[uid];
