@@ -17,9 +17,27 @@
     }))
   };
 
+  const Clip = {
+    init(props) {
+      Object.assign(this, props);
+    },
+
+    async image(name) {
+      return this[name];
+    }
+  };
+
   const ClipStore = {
     init() {
       this.details = null;
+    },
+
+    instance() {
+      if (!ClipStore.singletonInstance) {
+        ClipStore.singletonInstance = Object.create(ClipStore);
+      }
+
+      return ClipStore.singletonInstance;
     },
 
     list() {
@@ -32,7 +50,7 @@
     async loadById(uid) {
       const clip = Object.create(Clip);
 
-      const details = await clipStore.listDetails();
+      const details = await ClipStore.instance().listDetails();
       clip.init(details[uid]);
 
       return clip;
@@ -48,18 +66,6 @@
       }));
 
       return this.details;
-    }
-  };
-
-  const clipStore = Object.create(ClipStore);
-
-  const Clip = {
-    init(props) {
-      Object.assign(this, props);
-    },
-
-    async image(name) {
-      return this[name];
     }
   };
 
@@ -112,6 +118,7 @@
 
   const renderers = {
     index: async output => {
+      const clipStore = ClipStore.instance();
       const clipList = await clipStore.list();
       if (!clipList) {
         return;
@@ -151,6 +158,7 @@
     },
 
     clip: uid => async output => {
+      const clipStore = ClipStore.instance();
       const clip = await clipStore.loadById(uid);
       const thumbnail = await clip.image('thumbnail');
 
