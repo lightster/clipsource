@@ -1,4 +1,3 @@
-import Clip from './Clip.js';
 import ClipStore from './ClipStore.js';
 
 (function () {
