@@ -1,5 +1,5 @@
-import BrowserStorage from './BrowserStorage.js';
-import Clip from './Clip.js';
+import BrowserStorage from './browser-storage';
+import Clip from './clip';
 
 const ClipStore = {
   init() {
