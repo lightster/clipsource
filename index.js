@@ -1,4 +1,4 @@
-import ClipStore from './clip-store';
+import ClipStore from './clip-store.js';
 
 (function () {
   const doc = document;

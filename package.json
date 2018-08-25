@@ -11,7 +11,8 @@
       "window"
     ],
     "rules": {
-      "no-unused-vars": ["error", {"args": "none"}]
+      "no-unused-vars": ["error", {"args": "none"}],
+      "import/extensions": ["off"]
     }
   }
 }
