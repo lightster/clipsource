@@ -35,9 +35,9 @@ const ClipStore = {
       return this.details;
     }
 
-    this.details = new Promise(resolve => chrome.storage.local.get('clips', ({clips}) => {
-      resolve(clips);
-    }));
+    this.details = BrowserStorage.get(['clips']).then(({clips}) => {
+      return clips;
+    });
 
     return this.details;
   }
