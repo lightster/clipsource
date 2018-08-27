@@ -187,15 +187,14 @@ import ClipStore from './clip-store.js';
       return;
     }
 
+    event.stopPropagation();
+
     const uid = target.getAttribute('data-clipsource-uid');
     const action = target.getAttribute('data-clipsource-action');
 
-    chrome.storage.local.get(['clips'], storage => {
-      const clip = storage.clips[uid];
+    ClipStore.loadById(uid).then(clip => {
       actions[action](clip, event);
     });
-
-    event.stopPropagation();
   });
 
   window.addEventListener('hashchange', event => {
