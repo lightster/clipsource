@@ -30,6 +30,13 @@ const ClipStore = {
     return clip;
   },
 
+  async save(clip) {
+    const clips = await ClipStore.instance().listDetails();
+    clips[clip.uid] = clip;
+
+    return BrowserStorage.set({clips});
+  },
+
   listDetails() {
     if (this.details) {
       return this.details;

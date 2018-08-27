@@ -156,10 +156,7 @@ import ClipStore from './clip-store.js';
     delete: (clip, event) => {
       clip.deletedAt = Date.now();
 
-      chrome.storage.local.get(['clips'], storage => {
-        storage.clips[clip.uid] = clip;
-        chrome.storage.local.set({clips: storage.clips}, () => render(route()));
-      });
+      ClipStore.save(clip).then(() => render(route()));
     },
 
     copy: (clip, event) => {
