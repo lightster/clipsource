@@ -74,7 +74,7 @@ import ClipStore from './clip-store.js';
       for (const uid of clipList) {
         const clip = await clipStore.loadById(uid);
 
-        if (clip.deletedAt) {
+        if (clip.deletedAt || !clip.uid) {
           continue;
         }
 

@@ -1,3 +1,5 @@
+import ClipStore from './clip-store.js';
+
 (function () {
   const constrainBox = (inner, width, height) => {
     return {
@@ -157,36 +159,13 @@
   };
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action !== 'copy') {
-      return;
-    }
-
     const clip = request;
     Promise.all([saveClipboard(clip), saveImages(clip)]).then(() => {
-      chrome.storage.local.get(['clips', 'history', 'recent'], storage => {
-        clip.uid = btoa(clip.clipboard.plain)
-          .replace(/[^a-zA-Z0-9]/g, '')
-          .substring(0, 20)
-          .concat('-')
-          .concat(clip.clippedTime);
+      if (request.action !== 'copy') {
+        return;
+      }
 
-        if (!storage.clips) {
-          storage.clips = {};
-        }
-        if (!storage.recent) {
-          storage.recent = [];
-        }
-        if (!storage.history) {
-          storage.history = [];
-        }
-
-        storage.clips[clip.uid] = clip;
-        storage.recent.unshift(clip.uid);
-        storage.recent = storage.recent.slice(0, 10);
-        storage.history.push(clip.uid);
-
-        chrome.storage.local.set(storage);
-      });
+      ClipStore.save(request);
     });
   });
 })();
