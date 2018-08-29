@@ -1,4 +1,4 @@
-import ClipStore from './clip-store.js';
+import Clip from './clip.js';
 
 (function () {
   const constrainBox = (inner, width, height) => {
@@ -159,13 +159,13 @@ import ClipStore from './clip-store.js';
   };
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    const clip = request;
+    const clip = Clip.Init(request);
     Promise.all([saveClipboard(clip), saveImages(clip)]).then(() => {
       if (request.action !== 'copy') {
         return;
       }
 
-      ClipStore.save(request);
+      clip.save();
     });
   });
 })();

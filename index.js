@@ -1,4 +1,4 @@
-import ClipStore from './clip-store.js';
+import Clip from './clip.js';
 
 (function () {
   const doc = document;
@@ -62,8 +62,7 @@ import ClipStore from './clip-store.js';
 
   const renderers = {
     index: async output => {
-      const clipStore = ClipStore.instance();
-      const clipList = await clipStore.list();
+      const clipList = await Clip.List();
       if (!clipList) {
         return;
       }
@@ -72,7 +71,7 @@ import ClipStore from './clip-store.js';
       buffer.setAttribute('class', 'clips');
 
       for (const uid of clipList) {
-        const clip = await clipStore.loadById(uid);
+        const clip = await Clip.LoadById(uid);
 
         if (clip.deletedAt || !clip.uid) {
           continue;
@@ -102,8 +101,7 @@ import ClipStore from './clip-store.js';
     },
 
     clip: uid => async output => {
-      const clipStore = ClipStore.instance();
-      const clip = await clipStore.loadById(uid);
+      const clip = await Clip.LoadById(uid);
       const thumbnail = await clip.image('thumbnail');
 
       const dom = createFromTemplate('clip/details');
@@ -156,7 +154,7 @@ import ClipStore from './clip-store.js';
     delete: (clip, event) => {
       clip.deletedAt = Date.now();
 
-      ClipStore.save(clip).then(() => render(route()));
+      clip.save().then(() => render(route()));
     },
 
     copy: (clip, event) => {
@@ -189,7 +187,7 @@ import ClipStore from './clip-store.js';
     const uid = target.getAttribute('data-clipsource-uid');
     const action = target.getAttribute('data-clipsource-action');
 
-    ClipStore.loadById(uid).then(clip => {
+    Clip.LoadById(uid).then(clip => {
       actions[action](clip, event);
     });
   });
