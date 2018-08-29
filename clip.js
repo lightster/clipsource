@@ -23,29 +23,8 @@ const saveToList = (clip) => {
 let details = null;
 
 const Clip = {
-  Init(props) {
-    const clip = Object.create(Clip);
-
-    Object.assign(clip, props);
-
-    return clip;
-  },
-
   async image(name) {
     return this[name];
-  },
-
-  List() {
-    const key = 'history';
-    return BrowserStorage.get([key]).then(storage => {
-      return storage[key];
-    });
-  },
-
-  async LoadById(uid) {
-    const details = await Clip.ListDetails();
-
-    return Clip.Init(details[uid]);
   },
 
   async save() {
@@ -63,6 +42,27 @@ const Clip = {
     clips[this.uid] = this;
 
     return BrowserStorage.set({clips});
+  },
+
+  Init(props) {
+    const clip = Object.create(Clip);
+
+    Object.assign(clip, props);
+
+    return clip;
+  },
+
+  List() {
+    const key = 'history';
+    return BrowserStorage.get([key]).then(storage => {
+      return storage[key];
+    });
+  },
+
+  async LoadById(uid) {
+    const details = await Clip.ListDetails();
+
+    return Clip.Init(details[uid]);
   },
 
   ListDetails() {
