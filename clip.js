@@ -24,7 +24,19 @@ let details = null;
 
 const Clip = {
   async image(name) {
-    return this[name];
+    if (!this['images']) {
+      this['images'] = {};
+    }
+
+    const key = `image_${this.uid}_${name}`;
+
+    if (this['images'][name]) {
+      return this['images'][name];
+    }
+
+    this['images'][name] = BrowserStorage.get(key).then(storage => storage[key] || this[name]);
+
+    return this['images'][name];
   },
 
   async save() {
@@ -41,7 +53,11 @@ const Clip = {
     const clips = await Clip.ListDetails();
     clips[this.uid] = this;
 
-    return BrowserStorage.set({clips});
+    const storage = {clips};
+    storage[`image_${this.uid}_screenshot`] = this.screenshot;
+    storage[`image_${this.uid}_thumbnail`] = this.thumbnail;
+
+    return BrowserStorage.set(storage);
   },
 
   Init(props) {
