@@ -1,10 +1,7 @@
 import BrowserStorage from './browser-storage.js';
 
 const saveToList = (clip) => {
-  return BrowserStorage.get(['clips', 'history', 'recent']).then(storage => {
-    if (!storage.clips) {
-      storage.clips = {};
-    }
+  return BrowserStorage.get(['history', 'recent']).then(storage => {
     if (!storage.recent) {
       storage.recent = [];
     }
@@ -50,9 +47,6 @@ const Clip = {
       await saveToList(this);
     }
 
-    const clips = await Clip.ListDetails();
-    clips[this.uid] = this;
-
     const clipToStore = Object.assign({}, this);
     delete clipToStore.screenshot;
     delete clipToStore.thumbnail;
@@ -82,23 +76,10 @@ const Clip = {
 
   async LoadById(uid) {
     const key = `clip_${uid}`;
-    const details = await BrowserStorage.get([key]).then(
-      storage => storage[key] || Clip.ListDetails().then(clips => clips[uid])
-    );
+    const details = await BrowserStorage.get([key])
+      .then(storage => storage[key]);
 
     return Clip.Init(details);
-  },
-
-  ListDetails() {
-    if (details) {
-      return details;
-    }
-
-    details = BrowserStorage.get(['clips']).then(({clips}) => {
-      return clips;
-    });
-
-    return details;
   }
 };
 
