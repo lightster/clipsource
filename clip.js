@@ -53,7 +53,12 @@ const Clip = {
     const clips = await Clip.ListDetails();
     clips[this.uid] = this;
 
-    const storage = {clips};
+    const clipToStore = Object.assign({}, this);
+    delete clipToStore.screenshot;
+    delete clipToStore.thumbnail;
+
+    const storage = {};
+    storage[`clip_${this.uid}`]= clipToStore;
     storage[`image_${this.uid}_screenshot`] = this.screenshot;
     storage[`image_${this.uid}_thumbnail`] = this.thumbnail;
 
@@ -76,9 +81,12 @@ const Clip = {
   },
 
   async LoadById(uid) {
-    const details = await Clip.ListDetails();
+    const key = `clip_${uid}`;
+    const details = await BrowserStorage.get([key]).then(
+      storage => storage[key] || Clip.ListDetails().then(clips => clips[uid])
+    );
 
-    return Clip.Init(details[uid]);
+    return Clip.Init(details);
   },
 
   ListDetails() {
